@@ -1,0 +1,150 @@
+
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+name: Fabric
+version: "1.0"
+mutual-tls: false
+
+caliper:
+  blockchain: fabric
+  #command:
+  #  start: export FABRIC_VERSION=1.4.4;export FABRIC_CA_VERSION=1.4.4;docker-compose -f docker-compose/fabric144/2org1peercouchdb_solo_raft.yaml up -d;sleep 20s
+  #  end: docker-compose -f docker-compose/fabric144/2org1peercouchdb_solo_raft.yaml down;(test -z \"$(docker ps -aq)\") || docker rm $(docker ps -aq);(test -z \"$(docker images dev* -q)\") || docker rmi $(docker images dev* -q);rm -rf /tmp/hfc-*
+
+info:
+  Version: 1.4.4
+  Size: 2 Orgs with 4 Peer
+  Orderer: Raft
+  Distribution: Single Host
+  StateDB: CouchDB
+
+clients:
+# Crypto material path for the client ID's. 
+# ID type generated here must be of type "client" by fabric CA
+  client0.orga.example.com:
+    client:
+      organization: OrgA
+      credentialStore:
+        path: /tmp/hfc-kvs/orga
+        cryptoStore:
+          path: /tmp/hfc-cvs/orga
+      clientPrivateKey:
+        path: config/crypto-config/orga/user2-orga/msp/keystore/334440c3b8f64d6f7a9ae32f5a6748d26ed0aa6a5a8290fbf4d6ebbbf446a7fb_sk
+      clientSignedCert:
+        path: config/crypto-config/orga/user2-orga/msp/signcerts/cert.pem
+
+  client0.orgb.example.com:
+    client:
+      organization: OrgB
+      credentialStore:
+        path: /tmp/hfc-kvs/orgb
+        cryptoStore:
+          path: /tmp/hfc-cvs/orgb
+      clientPrivateKey:
+        path: config/crypto-config/orgb/user2-orgb/msp/keystore/97dea3454930e899fa5a642251a0a7763664b7842042fa9ce167bf5760becbd5_sk
+      clientSignedCert:
+        path: config/crypto-config/orgb/user2-orgb/msp/signcerts/cert.pem
+
+
+channels:
+  testchannel:
+    created: true
+#    definition:
+#        capabilities: []
+#        consortium: 'SampleConsortium'
+#        msps: ['Org1MSP', 'Org2MSP']
+#        version: 0
+    orderers:
+    - orderer.ceadar.com
+    peers:
+      peer0.orga.ceadar.com:
+        eventSource: true
+      peer0.orgb.ceadar.com:
+        eventSource: true
+
+    chaincodes:
+    - id: marbles
+      version: "1.0.0"
+      language: node
+      path: config/chaincode/marbles
+      metadataPath: config/chaincode/marbles/metadata    
+#    - id: product-key
+#      version: "0.0.1"
+#      language: node
+#      path: config/chaincode/product-key
+#      metadataPath: config/chaincode/marbles/metadata
+
+
+organizations:
+  OrgA:
+    mspid: OrgAMSP
+    peers:
+    - peer0.orga.ceadar.com
+    certificateAuthorities:
+    - orgaca
+    adminPrivateKey:
+      path: config/crypto-config/orga/admin-orga/msp/keystore/70c3f52f9715e166edbca8cfe483798f31041183d9aca9032e219d480173b347_sk
+    signedCert:
+      path: config/crypto-config/orga/admin-orga/msp/signcerts/cert.pem
+
+  OrgB:
+    mspid: OrgBMSP
+    peers:
+    - peer0.orgb.ceadar.com
+    certificateAuthorities:
+    - orgbca
+    adminPrivateKey:
+      path: config/crypto-config/orgb/admin-orgb/msp/keystore/34110461881bd1d523161679d69de6a6f951e93f6a7de8a0e50f0b2d6d35b5fc_sk
+    signedCert:
+      path: config/crypto-config/orgb/admin-orgb/msp/signcerts/cert.pem
+
+orderers:
+  orderer.ceadar.com:
+    url: grpcs://192.168.0.221:7050
+    tlsCACerts:
+            path: config/crypto-config/orderer/msp/tlscacerts/ca-cert.pem
+
+peers:
+  peer0.orga.ceadar.com:
+    url: grpcs://192.168.0.129:7051
+    tlsCACerts:
+            path: config/crypto-config/orga/peer0-orga/msp/tlscacerts/ca-cert.pem
+
+  peer0.orgb.ceadar.com:
+    url: grpcs://192.168.0.171:9051
+    tlsCACerts:
+            path: config/crypto-config/orgb/peer0-orgb/msp/tlscacerts/ca-cert.pem
+
+
+certificateAuthorities:
+  orgaca:
+    url: https://192.168.0.129:7010
+    httpOptions:
+      verify: false
+    tlsCACerts:
+            path: config/crypto-config/orga/peer0-orga/msp/tlscacerts/ca-cert.pem
+    registrar:
+    - enrollId: admin
+      enrollSecret: adminroot
+
+  orgbca:
+    url: https://192.168.0.171:7010
+    httpOptions:
+      verify: false
+    tlsCACerts:
+            path: config/crypto-config/orgb/peer0-orgb/msp/tlscacerts/ca-cert.pem
+    registrar:
+    - enrollId: admin
+      enrollSecret: adminroot

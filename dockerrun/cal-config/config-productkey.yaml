@@ -1,0 +1,31 @@
+test:
+  name: ceadar
+  description:
+     File to initialize and query the productkey smartconract
+  workers:
+    type: local
+    number: 1
+  rounds:
+  - label: init
+    description: Creating the product key
+    txNumber: 150
+    rateControl:
+      type: fixed-rate
+      opts:
+        tps: 50
+    callback: cal-config/init-productkey.js
+  - label: query
+    description: Querying the product key
+    txDuration: 10
+    rateControl:
+      type: fixed-rate
+      opts:
+        tps: 15
+    callback: cal-config/query-productkey.js
+monitor:
+  type:
+    - docker
+  docker:
+    name:
+      - all
+  interval: 1

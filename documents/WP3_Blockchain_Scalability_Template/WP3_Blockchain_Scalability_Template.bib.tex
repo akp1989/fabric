@@ -1,0 +1,200 @@
+\documentclass{ceadar_article}
+\usepackage{graphicx} % This lets you include figures
+\usepackage{mdframed}
+\usepackage{tabularx} % This lets you draw tables
+\usepackage{float} % This prevents LaTeX from re-positioning the tables.
+\usepackage{dirtytalk} % This lets you quote
+\usepackage{longtable, tabu}
+
+\restylefloat{table}
+
+\definecolor{mygrey}{gray}{0.8}
+
+
+\surroundwithmdframed[linewidth=0pt,backgroundcolor=mygrey]{verbatim}
+
+
+\begin{document}
+
+
+\title{Blockchain Scalability Testing (WP-3) Proposal}
+
+\abstract{
+Proposed plan for the Blockchain Scalability Testing (WP-3).
+}
+
+% Data for the front page table
+\doctype{Test Plan (Proposal)}
+\projecttitle{Blockchain Scalability Testing (WP-3) Proposal}
+\workpackage{3}
+\author{Prabhakaran AK, Saad Shahid, Ois\'{i}n Boydell}
+\docstate{Draft}
+\deliverydate{March 2020}
+\docversion{0.1}
+
+\maketitle
+
+\newpage
+
+
+\section{Introduction}
+
+Blockchain scalability testing is proposed to predict the performance of the blockchain network while the consortium grows over the period of time.
+
+As the number of nodes in the consortium grows, volume of the transactions going through the network is expected to grow as well. 
+
+This document proposes a test plan to analyze the impact of a growing blockchain network.
+\newline
+
+\section{Tool}
+Following are the various blockchain bench-marking tools available in the market:
+
+\begin{itemize}
+    \item Gremlin - Bench-marking tool to test the network components of the distributed ledger system.
+    
+    \item Hyperledger Caliper\footnote{\url{https://www.hyperledger.org/projects/caliper}}  - Tool to measures various performance metrics of smart contract. Supports multiple version of hyperledger fabric and few other blockchain platforms.
+    
+    \item MixBytes Tank\footnote{\url{https://mixbytes.io/tank}}  - Cloud-based blockchain bench-marking tool which does not have features to support consensus and underlying blockchain network component testing.
+\end{itemize}
+
+\subsection{Requirements}
+The requirement is to analyze the scalability performance of a smart contract in a blockchain network. The scalability check will determine the latency variation against the variation in transaction volume and throughput.
+
+
+\subsection{Assumptions}
+The methodology outlined in this document will be used as a reference point for all the scalability tests on the smart contracts, that will be part of work package six (WP-6)
+\newline
+The scalability tests part of WP-3 will be conducted in phases, when each smart contract(s) in WP -6 becomes available. 
+\newline
+For two different smart contracts having same processing overhead and computational complexity, the scalability performance check will be done against any one of them.
+
+
+\subsection{About Hyperledger Caliper}
+We are going to use Hyperledger Caliper \cite{hyperledgerCaliper}, a blockchain bench-mark tool to measure the performance of the blockchain implementation with a set of predefined use cases. \newline
+Hyperledger caliper is a blockchain performance bench-marking tool from the Linux foundation. 
+
+\subsection{Why Hyperledger Caliper}
+Caliper has a defined Performance \& Scalability Working Group (PSWG) \cite{pswg} which contains definitions and metrics for the blockchain network bench-marking. \newline
+It has support for multiple versions of hyperledger fabric which is our blockchain platform for the present use case\newline
+Caliper helps us to determine the various-metrics for given volume of transactions at defined throughput.
+
+\subsection {Performance \& Scalability Working Group - metrics}
+The metrics that are defined by the PSWG of Hyperledger caliper are as follows:
+
+\subsubsection{Success Rate} 
+Measures all successful and failed transactions for a test cycle.
+\begin{itemize}
+    \item This metrics is based on the volume of the transactions.
+    \item Caliper allows users to configure the transaction volume for the testing.
+    \item Caliper final report includes the success and failure rate for the given volume of transactions.
+\end{itemize}
+
+
+\subsubsection{Transaction \& Read Latency} 
+Measures the time for an issued transaction to be completed and a response being available to the application that issued the transaction. 
+
+\begin{itemize}
+    \item This metrics is based on the time taken for one single transaction in seconds.
+    \item Latency is the output by hyperledger caliper for given volume of transactions at defined throughput.
+    \item Maximum, minimum and average latency in seconds for the test cycle is provided.
+\end{itemize}
+
+\subsubsection{Transaction \& Read Throughput} 
+Measures the flow rate of all transactions through the system, in transactions per second, during the a cycle. 
+\begin{itemize}
+    \item This metrics defines the flow rate of transaction into the blockchain system.
+    \item Throughput can be configured at caliper.
+    \item Unit of measurement for throughput is Transactions per second (TPS).
+    \item Various types of throughput feeding is possible in caliper.
+    \begin{itemize}
+       \item fixed-rate : Fixed rate of throughput is maintained from start to end of the transaction volume.
+       \item linear-rate : Variable rate between beginning and towards end of the transaction volume.
+       \item composite-rate: Composite rate allows both fixed rate and linear rate throughput to be used on given transaction volume.
+     \end{itemize}
+   
+\end{itemize}
+
+\subsubsection{Dependency Latency vs Throughput}
+Hyperledger caliper provides sample smart contracts to run the scalability check, and based on the results of running it against different transaction volume and throughput we arrived at the following assumption:
+
+\begin{itemize}
+    \item Latency increases linearly with number of nodes in the network.
+    \item Throughput is configurable for each test run.
+    \item Latency increases when the volume of the transaction and throughput is increased. 
+\end{itemize}
+
+The same will be verified against each of our smart contract across WP-6 in phases.
+
+\subsection{Resource Consumption} Measures the following resource parameters of the blockchain network
+\begin{itemize}
+    \item Max. and Min, memory - Memory used in MegaBytes
+    \item CPU resource consumption - CPU usage in percentage
+    \item I/O traffic - KiloBytes/ MegaBytes
+\end{itemize}
+
+\section{Experiment}
+Hyperledger caliper allows us to test the blockchain scalability performance. 
+
+We intend to evaluate impact of variuos metrics on blockchain network while scaling up on the following scenarios:
+
+\subsection {Experiment runs}
+For this experimental purpose we will keep the total volume of transaction fixed at 15000 and perform the following. 
+
+A series of tests will be run against the number of nodes vs throughput to find the latency
+
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\# of nodes / TPS               & 100 & 500 & 1500 & 2500 \\ \hline
+10                                  &     &     &      &      \\ \hline
+25                                  &     &     &      &      \\ \hline
+50                                  &     &     &      &      \\ \hline
+100                                 &     &     &      &      \\ \hline
+5000                                &     &     &      &      \\ \hline
+\end{tabular}
+
+
+\begin{itemize}
+\item For a given number of nodes the tests are run at various throughput.
+\item The above process is repeated for increased node counts.
+\end{itemize}
+
+\subsection{Plotting the results}
+
+The results from the above experiments are plotted on charts e.g. latency for a given number of nodes vs throughput in transactions per seconds (TPS).
+
+These charts will help us understand the impact of the scalability of the network physically (increasing the nodes) or by scaling up the volume of transactions and throughput.
+
+\subsection{Hyperledger Caliper version}
+
+Hyperledger Caliper 0.2 supports multiple versions of Hyperledger Fabric, starting from fabric V1.0 and above.
+
+The configuration file contains the following details regarding the fabric network
+
+\begin{itemize}
+    \item Docker commands (if not preexisting network).
+    \item Fabric client node identity details.
+    \item Channel and chaincode details.
+    \item Organization identity details.
+    \item Peers and Certificate authority server address details.
+\end{itemize}
+
+\subsection{Blockchain network}
+Hyperledger caliper comes with default blockchain network containing two nodes. The networks comes in following different variations:
+
+\begin{itemize}
+    \item Solo orderer
+    \item Kafka orderer
+    \item Go level db
+    \item Couch db
+\end{itemize}
+
+The network can be bootstrapped on any unix machine for testing purpose. \newline
+We can also use our own blockchain networks or networks that are bootstrapped in any of the cloud storge providing blockchain-as-a 
+-service.
+\newpage
+
+\bibliographystyle{plain}
+\addcontentsline{toc}{section}{Bibliography}
+\bibliography{wp-3_scalability_proposal.bib}
+
+\end{document}

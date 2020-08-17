@@ -1,0 +1,57 @@
+[
+    {
+        "transactionName": "productKeyExists",
+        "transactionLabel": "A test productKeyExists transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "createProductKey",
+        "transactionLabel": "A test createProductKey transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {
+            "privateValue": "some value"
+        }
+    },
+    {
+        "transactionName": "readProductKey",
+        "transactionLabel": "A test readProductKey transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "updateProductKey",
+        "transactionLabel": "A test updateProductKey transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {
+            "privateValue": "some other value"
+        }
+    },
+    {
+        "transactionName": "deleteProductKey",
+        "transactionLabel": "A test deleteProductKey transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "verifyProductKey",
+        "transactionLabel": "A test verifyProductKey transaction",
+        "arguments":[
+            "001",
+            {
+                "privateValue": "some other value"
+            }
+        ],
+        "transientData": {}
+    }
+]
