@@ -1,0 +1,4 @@
+/var/hyperledger/production/chaincodes - Location of chaincode inside the peer container
+/var/hyperledger/production/ledgersdata - Location of the ledger data inside the peer container
+
+/var/hyperledger/production/ledgersdata/chains/chains/<Channelname> - Conatains the block file for the given channel
