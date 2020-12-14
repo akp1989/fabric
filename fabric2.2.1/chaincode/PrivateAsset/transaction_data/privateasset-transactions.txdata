@@ -1,0 +1,19 @@
+[
+    {
+        "transactionName": "createAsset",
+        "transactionLabel": "A test createAsset transaction",
+        "arguments": [
+            "001",
+            "some value"
+        ],
+        "transientData": {}
+    },
+    {
+        "transactionName": "readAsset",
+        "transactionLabel": "A test readAsset transaction",
+        "arguments": [
+            "001"
+        ],
+        "transientData": {}
+    }
+]

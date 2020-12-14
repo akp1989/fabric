@@ -1,0 +1,28 @@
+curl -sSL https://bit.ly/2ysbOFE | bash -s -- 2.2.1 1.4.9
+
+===> List out hyperledger docker images
+hyperledger/fabric-ca        1.4                 dbbc768aec79        6 weeks ago         158MB
+hyperledger/fabric-ca        1.4.9               dbbc768aec79        6 weeks ago         158MB
+hyperledger/fabric-ca        latest              dbbc768aec79        6 weeks ago         158MB
+hyperledger/fabric-tools     2.2                 e9b802fadb41        6 weeks ago         519MB
+hyperledger/fabric-tools     2.2.1               e9b802fadb41        6 weeks ago         519MB
+hyperledger/fabric-tools     latest              e9b802fadb41        6 weeks ago         519MB
+hyperledger/fabric-peer      2.2                 ece149884124        6 weeks ago         55MB
+hyperledger/fabric-peer      2.2.1               ece149884124        6 weeks ago         55MB
+hyperledger/fabric-peer      latest              ece149884124        6 weeks ago         55MB
+hyperledger/fabric-orderer   2.2                 78a16ddd2cf4        6 weeks ago         38.4MB
+hyperledger/fabric-orderer   2.2.1               78a16ddd2cf4        6 weeks ago         38.4MB
+hyperledger/fabric-orderer   latest              78a16ddd2cf4        6 weeks ago         38.4MB
+hyperledger/fabric-ccenv     2.2                 8e554c280cac        6 weeks ago         586MB
+hyperledger/fabric-ccenv     2.2.1               8e554c280cac        6 weeks ago         586MB
+hyperledger/fabric-ccenv     latest              8e554c280cac        6 weeks ago         586MB
+hyperledger/fabric-baseos    2.2                 0b99d26b26ad        6 weeks ago         6.85MB
+hyperledger/fabric-baseos    2.2.1               0b99d26b26ad        6 weeks ago         6.85MB
+hyperledger/fabric-baseos    latest              0b99d26b26ad        6 weeks ago         6.85MB
+
+docker pull couchdb:3.1 (Refered from release notes of fabric v 2.2.x. 
+docker tag 438167172b8a couchdb:latest
+
+
+fabric-ca-server and fabric-ca-client version used are 1.4.9
+
