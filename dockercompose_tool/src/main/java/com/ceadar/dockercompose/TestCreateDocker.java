@@ -10,8 +10,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.ceadar.config.Config;
-import com.ceadar.dockertemplate.CLI;
-import com.ceadar.dockertemplate.CLI_Helper;
 import com.ceadar.dockertemplate.CouchDB;
 import com.ceadar.dockertemplate.CouchDB_Helper;
 import com.ceadar.dockertemplate.DockerService;
@@ -35,11 +33,9 @@ public class TestCreateDocker {
 		CouchDB_Helper couchdb_helper = new CouchDB_Helper();
 		Peer_Helper peer_helper = new Peer_Helper();
 		Orderer_Helper orderer_helper = new Orderer_Helper();
-		CLI_Helper cli_helper = new CLI_Helper();
 		
 		Properties peerProperty = new Properties();
 		Properties ordererProperty = new Properties();
-		Properties cliProperty = new Properties();
 		
 		DockerService dockerService = new DockerService();
 			
@@ -49,7 +45,7 @@ public class TestCreateDocker {
 		
 		peerProperty.load(new FileInputStream("ceadar/Peer.properties"));
 		ordererProperty.load(new FileInputStream("ceadar/Orderer.properties"));
-		cliProperty.load(new FileInputStream("ceadar/CLI.properties"));
+
 		
 		final ObjectMapper mapper = new ObjectMapper(new YAMLFactory().enable(YAMLGenerator.Feature.MINIMIZE_QUOTES)
 																	.disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
@@ -70,13 +66,6 @@ public class TestCreateDocker {
 			volumeMap.put(peer.getContainer_name().concat("_msp"),"");
 			volumeMap.put(peer.getContainer_name()+"_data","");
 			
-			if(cliProperty.containsKey(orgName)) {
-				CLI cli = cli_helper.cliBuild(orgName, cliProperty.getProperty(orgName).split(","));
-				serviceMap.put(cli.getContainer_name(),cli);
-			}else
-			{
-				System.out.println("The CLI config not available for : "+ orgName);
-			}
 			networks.put(Config.NETWORK_NAME,"");
 		}
 		propertyKeys.clear();
