@@ -1,0 +1,20 @@
+* Check the version of CA server in all the server docker-compose file (1.4.9)
+* Include the SANS parameter "*.ceadar.org" in the TLS server config file
+* Start the server
+* Copy the root CA cert of TLS server to TLS-client folder and root CA cert of org servers to the corresponding Org client folder
+* Generate the CA certificates
+
+./generatecrypto.sh orderer -a localhost -p 7710 -t 7701 -d ceadar.org -o orderer1 -s 127.0.0.1,*.ceadar.org
+./generatecrypto.sh orderer -a localhost -p 7710 -t 7701 -d ceadar.org -o orderer2 -s 127.0.0.1,*.ceadar.org
+./generatecrypto.sh orderer -a localhost -p 7710 -t 7701 -d ceadar.org -o orderer3 -s 127.0.0.1,*.ceadar.org
+
+./generatecrypto.sh peer -a localhost -p 7710 -t 7701 -d ceadar.org -o org1 -s 127.0.0.1,*.org1.ceadar.org
+./generatecrypto.sh peer -a localhost -p 7710 -t 7701 -d ceadar.org -o org2 -s 127.0.0.1,*.org2.ceadar.org
+./generatecrypto.sh peer -a localhost -p 7710 -t 7701 -d ceadar.org -o org3 -s 127.0.0.1,*.org3.ceadar.org
+./generatecrypto.sh peer -a localhost -p 7710 -t 7701 -d ceadar.org -o org4 -s 127.0.0.1,*.org4.ceadar.org
+
+* Under org-crypto folder create a new MSP folder for orderer
+* Copy any of the orderer's msp folder into it. Retain only the CA cert, TLS CA cert and Admin certs
+* Make sure all the orderers contain the same admin certs that is present in the orderer's msp folder
+
+./generatecrypto.sh peer -a localhost -p 7710 -t 7701 -d ceadar.org -o org5 -s 127.0.0.1,*.org5.ceadar.org

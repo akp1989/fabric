@@ -1,0 +1,92 @@
+To add an organization
+
+Open the addorg directory
+
+export PATH=$PATH:./../bin
+export FABRIC_CFG_PATH=${PWD}
+
+cryptogen generate --config=org5-crypto.yaml
+
+Change the FABRIC_LOGGING_SPEC to DEBUG in the CLI container in the docker-compose.yaml
+
+
+
+./../bin/configtxgen -printOrg Org5MSP > ./../channel-artifacts/org5.json
+
+
+Copy the orderer artifacts into the new org crypto-config folder
+cp -r ./../crypto-config/ordererOrganizations ./crypto-config/
+
+login to existing CLI
+export ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem 
+export CHANNEL_NAME=testchannel
+
+peer channel fetch config config_block.pb -o orderer.example.com:7050 -c $CHANNEL_NAME --tls --cafile $ORDERER_CA
+
+ON the debug logs check for the latest block (After running the previous setup it should be block 6)
+
+
+Decode the config block json file using the jq tool
+configtxlator proto_decode --input config_block.pb --type common.Block | jq .data.data[0].payload.data.config > config.json
+
+Use jq tool to decode the org5 json file
+jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"Org5MSP":.[1]}}}}}' config.json ./channel-artifacts/org5.json > modified_config.json
+
+
+Use configtxlator to convert the config and new config to protobuf format
+configtxlator proto_encode --input config.json --type common.Config --output config.pb
+configtxlator proto_encode --input modified_config.json --type common.Config --output modified_config.pb
+
+Calculate the delta between the two protobuf files
+configtxlator compute_update --channel_id $CHANNEL_NAME --original config.pb --updated modified_config.pb --output org5_update.pb
+
+Decode the delta update file
+configtxlator proto_decode --input org5_update.pb --type common.ConfigUpdate | jq . > org5_update.json
+
+Add header to the updated file
+echo '{"payload":{"header":{"channel_header":{"channel_id":"'$CHANNEL_NAME'", "type":2}},"data":{"config_update":'$(cat org5_update.json)'}}}' | jq . > org5_update_in_envelope.json
+
+Convert back the header appended file back to protobuf format
+configtxlator proto_encode --input org5_update_in_envelope.json --type common.Envelope --output org5_update_in_envelope.pb
+
+Sign the config change protobuf file as Org1, Org2, Org3, Org4
+peer channel signconfigtx -f org5_update_in_envelope.pb
+
+Update the channel as any one of the admin org (Org1)
+peer channel update -f org5_update_in_envelope.pb -c $CHANNEL_NAME -o orderer.example.com:7050 --tls --cafile $ORDERER_CA
+
+Bring up the container with new org peers, couchdb and CLI containers
+docker-compose -f docker-compose-org5.yaml up -d
+
+export ORDERER_CA=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem
+export CHANNEL_NAME=testchannel
+
+peer channel fetch 0 testchannel.block -o orderer.example.com:7050 -c $CHANNEL_NAME --tls --cafile $ORDERER_CA
+
+peer channel join -b testchannel.block
+
+Install the chaincode in all the peers as new version and upgraded 
+peer chaincode install -n mycc -v 2.0 -p github.com/chaincode/chaincode_example02/go/
+peer chaincode upgrade -o orderer.example.com:7050 --tls $CORE_PEER_TLS_ENABLED --cafile $ORDERER_CA -C $CHANNEL_NAME -n mycc -v 2.0 -c '{"Args":["init","a","90","b","210"]}' -P "OR ('Org1MSP.peer','Org2MSP.peer','Org3MSP.peer','Org4MSP.peer','Org5MSP.peer')"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
