@@ -25,7 +25,7 @@ import java.util.Map;
 
 @Default
 public class AssetContract implements ContractInterface {
-
+    
     //Method to retrieve the transaction history for the given key
     @Transaction()
     public String getTransactionHistory(Context ctx, String assetId) {
@@ -37,7 +37,7 @@ public class AssetContract implements ContractInterface {
             keyHistory.put("TransactionID", keyModification.getTxId());
             keyHistory.put("Value", new String(keyModification.getValue()));
             keyHistory.put("Timestamp", keyModification.getTimestamp());
-
+            keyHistory.put("IsDeleted",keyModification.isDeleted());
             keyHistoryJsonArray.put(keyHistory);
         }
         return keyHistoryJsonArray.toString();
@@ -100,6 +100,20 @@ public class AssetContract implements ContractInterface {
         return String.format ("Following asset %s created successfully with transaction ID %s",assetObject.toString(),ctx.getStub().getTxId());
     }
 
+    //Delete an asset
+    @Transaction()
+    public String assetDelete(Context ctx, String assetId){
+
+        boolean assetExists = assetExists (ctx, assetId);
+        if (!assetExists){
+            throw new ChaincodeException("The given asset " + assetId + " does not exists ");
+        }
+        
+        ctx.getStub().delPrivateData(getImplicitPolicy(ctx),assetId);
+        ctx.getStub().delState(assetId);
+        return String.format ("Following asset %s deleted successfully with transaction ID %s ",assetId,ctx.getStub().getTxId());
+    }
+
     //Reads the asset from public world state
     @Transaction()
     public String assetRead(Context ctx, String assetId){
@@ -143,7 +157,7 @@ public class AssetContract implements ContractInterface {
         Asset assetObject = new Asset();
         assetObject = assetObject.fromJSONString(new String(ctx.getStub().getState(assetId),UTF_8));
         assetObject.setAssetDescription(assetDescription);
-        ctx.getStub().delState(assetId);
+        //ctx.getStub().delState(assetId);
         //ctx.getStub().setStateValidationParameter(assetId, stateValidationEndorsement(ctx));
         ctx.getStub().putState(assetId, assetObject.toJSONString().getBytes(UTF_8));
 
@@ -163,7 +177,7 @@ public class AssetContract implements ContractInterface {
             AssetPrivate assetPrivateObject = new AssetPrivate();
             assetPrivateObject = assetPrivateObject.fromJSONString(new String(ctx.getStub().getPrivateData(getImplicitPolicy(ctx),assetId),UTF_8));
             assetPrivateObject.setAssetPrice(assetPrice);
-            ctx.getStub().delPrivateData(getImplicitPolicy(ctx),assetId);
+            //ctx.getStub().delPrivateData(getImplicitPolicy(ctx),assetId);
             //ctx.getStub().setPrivateDataValidationParameter(getImplicitPolicy(ctx), assetId, stateValidationEndorsement(ctx));
             ctx.getStub().putPrivateData(getImplicitPolicy(ctx), assetId, assetPrivateObject.toJSONString().getBytes(UTF_8));
 
