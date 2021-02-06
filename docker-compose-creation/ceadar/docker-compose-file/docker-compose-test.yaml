@@ -1,0 +1,445 @@
+version: 2
+volumes:
+  couchdb0.org3.ceadar.com_data:
+  peer0.org2.ceadar.com_data:
+  peer0.org1.ceadar.com_data:
+  couchdb0.org1.ceadar.com_etc:
+  peer0.org2.ceadar.com_msp:
+  peer0.org4.ceadar.com_msp:
+  couchdb0.org3.ceadar.com_etc:
+  peer0.org3.ceadar.com_data:
+  couchdb0.org2.ceadar.com_data:
+  orderer3.ceadar.com_data:
+  orderer2.ceadar.com_msp:
+  couchdb0.org1.ceadar.com_data:
+  peer0.org1.ceadar.com_msp:
+  orderer2.ceadar.com_data:
+  couchdb0.org4.ceadar.com_data:
+  peer0.org3.ceadar.com_msp:
+  orderer1.ceadar.com_data:
+  peer0.org4.ceadar.com_data:
+  couchdb0.org4.ceadar.com_etc:
+  orderer1.ceadar.com_msp:
+  couchdb0.org2.ceadar.com_etc:
+  orderer3.ceadar.com_msp:
+networks:
+  fabric144:
+services:
+  peer0.org3.ceadar.com:
+    container_name: peer0.org3.ceadar.com
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+     - CORE_PEER_ADDRESS=peer0.org3.ceadar.com:11051
+     - CORE_PEER_ID=peer0.org3.ceadar.com
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3.ceadar.com:11051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+     - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org3.ceadar.com:5984
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_PROFILE_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:11051
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:11151
+     - CORE_PEER_LOCALMSPID=Org3MSP
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3.ceadar.com:11051
+     - CORE_PEER_CHAINCODEADDRESS=peer0.org3.ceadar.com:11151
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/org3/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org3/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.org3.ceadar.com_msp:/etc/hyperledger/fabric
+     - peer0.org3.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 11051:11051
+    networks:
+     - fabric144
+  cliorg1.ceadar.com:
+    container_name: cliorg1.ceadar.com
+    image: hyperledger/fabric-tools:latest
+    tty: true
+    stdin_open: true
+    environment:
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=Org1MSP
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/adminmsp
+     - CORE_PEER_ADDRESS=peer0.org1.ceadar.com:7051
+     - CORE_PEER_ID=cliorg1.ceadar.com
+     - GOPATH=/opt/gopath
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+     - /var/run:/host/var/run
+     - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+     - ./../channelartifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channelartifacts
+     - ./../crypto/org1/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org1/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - ./../crypto/org1/adminuser/msp:/etc/hyperledger/fabric/adminmsp
+    networks:
+     - fabric144
+  orderer2.ceadar.com:
+    container_name: orderer2.ceadar.com
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer2.ceadar.com
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_KAFKA_VERBOSE=true
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_LISTENPORT=9050
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer2/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer2/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer2.ceadar.com_msp:/var/hyperledger/orderer
+     - orderer2.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 9050:9050
+    networks:
+     - fabric144
+  couchdb0.org3.ceadar.com:
+    container_name: couchdb0.org3.ceadar.com
+    image: hyperledger/fabric-couchdb
+    environment:
+     - COUCHDB_USER=
+     - COUCHDB_PASSWORD=
+    volumes:
+     - couchdb0.org3.ceadar.com_data:/opt/couchdb/data
+     - couchdb0.org3.ceadar.com_etc:/opt/couchdb/etc/local.d
+    ports:
+     - 12051:5984
+    networks:
+     - fabric144
+  cliorg3.ceadar.com:
+    container_name: cliorg3.ceadar.com
+    image: hyperledger/fabric-tools:latest
+    tty: true
+    stdin_open: true
+    environment:
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=Org3MSP
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/adminmsp
+     - CORE_PEER_ADDRESS=peer0.org3.ceadar.com:11051
+     - CORE_PEER_ID=cliorg3.ceadar.com
+     - GOPATH=/opt/gopath
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+     - /var/run:/host/var/run
+     - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+     - ./../channelartifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channelartifacts
+     - ./../crypto/org3/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org3/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - ./../crypto/org3/adminuser/msp:/etc/hyperledger/fabric/adminmsp
+    networks:
+     - fabric144
+  orderer3.ceadar.com:
+    container_name: orderer3.ceadar.com
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer3.ceadar.com
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_KAFKA_VERBOSE=true
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_LISTENPORT=11050
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer3/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer3/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer3.ceadar.com_msp:/var/hyperledger/orderer
+     - orderer3.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 11050:11050
+    networks:
+     - fabric144
+  peer0.org1.ceadar.com:
+    container_name: peer0.org1.ceadar.com
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+     - CORE_PEER_ADDRESS=peer0.org1.ceadar.com:7051
+     - CORE_PEER_ID=peer0.org1.ceadar.com
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1.ceadar.com:7051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+     - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org1.ceadar.com:5984
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_PROFILE_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7151
+     - CORE_PEER_LOCALMSPID=Org1MSP
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1.ceadar.com:7051
+     - CORE_PEER_CHAINCODEADDRESS=peer0.org1.ceadar.com:7151
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/org1/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org1/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.org1.ceadar.com_msp:/etc/hyperledger/fabric
+     - peer0.org1.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 7051:7051
+    networks:
+     - fabric144
+  couchdb0.org4.ceadar.com:
+    container_name: couchdb0.org4.ceadar.com
+    image: hyperledger/fabric-couchdb
+    environment:
+     - COUCHDB_USER=
+     - COUCHDB_PASSWORD=
+    volumes:
+     - couchdb0.org4.ceadar.com_data:/opt/couchdb/data
+     - couchdb0.org4.ceadar.com_etc:/opt/couchdb/etc/local.d
+    ports:
+     - 14051:5984
+    networks:
+     - fabric144
+  orderer1.ceadar.com:
+    container_name: orderer1.ceadar.com
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer1.ceadar.com
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_KAFKA_VERBOSE=true
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_LISTENPORT=7050
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer1/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer1/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer1.ceadar.com_msp:/var/hyperledger/orderer
+     - orderer1.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 7050:7050
+    networks:
+     - fabric144
+  cliorg2.ceadar.com:
+    container_name: cliorg2.ceadar.com
+    image: hyperledger/fabric-tools:latest
+    tty: true
+    stdin_open: true
+    environment:
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=Org2MSP
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/adminmsp
+     - CORE_PEER_ADDRESS=peer0.org2.ceadar.com:9051
+     - CORE_PEER_ID=cliorg2.ceadar.com
+     - GOPATH=/opt/gopath
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+     - /var/run:/host/var/run
+     - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+     - ./../channelartifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channelartifacts
+     - ./../crypto/org2/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org2/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - ./../crypto/org2/adminuser/msp:/etc/hyperledger/fabric/adminmsp
+    networks:
+     - fabric144
+  couchdb0.org2.ceadar.com:
+    container_name: couchdb0.org2.ceadar.com
+    image: hyperledger/fabric-couchdb
+    environment:
+     - COUCHDB_USER=
+     - COUCHDB_PASSWORD=
+    volumes:
+     - couchdb0.org2.ceadar.com_data:/opt/couchdb/data
+     - couchdb0.org2.ceadar.com_etc:/opt/couchdb/etc/local.d
+    ports:
+     - 10051:5984
+    networks:
+     - fabric144
+  couchdb0.org1.ceadar.com:
+    container_name: couchdb0.org1.ceadar.com
+    image: hyperledger/fabric-couchdb
+    environment:
+     - COUCHDB_USER=
+     - COUCHDB_PASSWORD=
+    volumes:
+     - couchdb0.org1.ceadar.com_data:/opt/couchdb/data
+     - couchdb0.org1.ceadar.com_etc:/opt/couchdb/etc/local.d
+    ports:
+     - 8051:5984
+    networks:
+     - fabric144
+  cliorg4.ceadar.com:
+    container_name: cliorg4.ceadar.com
+    image: hyperledger/fabric-tools:latest
+    tty: true
+    stdin_open: true
+    environment:
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=Org4MSP
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/adminmsp
+     - CORE_PEER_ADDRESS=peer0.org4.ceadar.com:13051
+     - CORE_PEER_ID=cliorg4.ceadar.com
+     - GOPATH=/opt/gopath
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    command: /bin/bash
+    volumes:
+     - /var/run:/host/var/run
+     - ./../chaincode/:/opt/gopath/src/github.com/chaincode
+     - ./../channelartifacts:/opt/gopath/src/github.com/hyperledger/fabric/peer/channelartifacts
+     - ./../crypto/org4/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org4/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - ./../crypto/org4/adminuser/msp:/etc/hyperledger/fabric/adminmsp
+    networks:
+     - fabric144
+  peer0.org4.ceadar.com:
+    container_name: peer0.org4.ceadar.com
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+     - CORE_PEER_ADDRESS=peer0.org4.ceadar.com:13051
+     - CORE_PEER_ID=peer0.org4.ceadar.com
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org4.ceadar.com:13051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+     - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org4.ceadar.com:5984
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_PROFILE_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:13051
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:13151
+     - CORE_PEER_LOCALMSPID=Org4MSP
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org4.ceadar.com:13051
+     - CORE_PEER_CHAINCODEADDRESS=peer0.org4.ceadar.com:13151
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/org4/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org4/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.org4.ceadar.com_msp:/etc/hyperledger/fabric
+     - peer0.org4.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 13051:13051
+    networks:
+     - fabric144
+  peer0.org2.ceadar.com:
+    container_name: peer0.org2.ceadar.com
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_fabric144
+     - CORE_PEER_ADDRESS=peer0.org2.ceadar.com:9051
+     - CORE_PEER_ID=peer0.org2.ceadar.com
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2.ceadar.com:9051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+     - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0.org2.ceadar.com:5984
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_PROFILE_ENABLED=true
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9151
+     - CORE_PEER_LOCALMSPID=Org2MSP
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2.ceadar.com:9051
+     - CORE_PEER_CHAINCODEADDRESS=peer0.org2.ceadar.com:9151
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/org2/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/org2/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.org2.ceadar.com_msp:/etc/hyperledger/fabric
+     - peer0.org2.ceadar.com_data:/var/hyperledger/production
+    ports:
+     - 9051:9051
+    networks:
+     - fabric144
