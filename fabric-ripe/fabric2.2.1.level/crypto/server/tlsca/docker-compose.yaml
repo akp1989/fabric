@@ -1,0 +1,11 @@
+tls.ripe.io:
+  image: hyperledger/fabric-ca:1.4.9
+  container_name: tls.ripe.io
+  ports:
+    - "17701:17701"
+  environment:
+    - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+  volumes:
+    - "$PWD:/etc/hyperledger/fabric-ca-server"
+    - tls.ca_data:/etc/hyperledger
+  command: sh -c 'fabric-ca-server start -b admin:adminroot'

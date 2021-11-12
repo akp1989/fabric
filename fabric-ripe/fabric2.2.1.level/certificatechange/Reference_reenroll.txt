@@ -1,0 +1,42 @@
+export FABRIC_CA_CLIENT_HOME=$PWD
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$PWD/tls-root-cert/tls-ca-cert.pem 
+ 
+##Renrolling peer certificate
+ 
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/peer0-root/msp
+ ./fabric-ca-client reenroll -d -u https://peer0.root.ripe.io:orgroot@localhost:17720 --id.type peer --csr.cn 'peer0.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io' --csr.keyrequest.reusekey 
+
+
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/peer0-test/msp
+ ./fabric-ca-client reenroll -d -u https://peer0.test.ripe.io:orgroot@localhost:17720 --id.type peer --csr.cn 'peer0.test.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.test.ripe.io' --csr.keyrequest.reusekey 
+
+
+##Renrolling peer TLS certificates
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/tls-peer0-root/msp
+ ./fabric-ca-client reenroll -d -u https://tls-peer0.root.ripe.io:orgroot@localhost:17701 --id.type peer --csr.cn 'tls-peer0.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io' --csr.keyrequest.reusekey 
+
+
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/tls-peer0-test/msp
+ ./fabric-ca-client reenroll -d -u https://tls-peer0.test.ripe.io:orgroot@localhost:17701 --id.type peer --csr.cn 'tls-peer0.test.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.test.ripe.io' --csr.keyrequest.reusekey 
+
+##Renrolling peer admin certificates
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/admin-root/msp
+ ./fabric-ca-client reenroll -d -u https://admin.root.ripe.io:adminroot@localhost:17720 --id.type peer --csr.cn 'admin.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io' --csr.keyrequest.reusekey 
+
+
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/admin-test/msp
+ ./fabric-ca-client reenroll -d -u https://admin.test.ripe.io:adminroot@localhost:17720 --id.type peer --csr.cn 'admin.test.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.test.ripe.io' --csr.keyrequest.reusekey 
+
+##Reenrolling orderer certificates
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/orderer-orderer3/msp
+ ./fabric-ca-client reenroll -d -u https://orderer.orderer3.ripe.io:orgroot@localhost:17720 --id.type orderer --csr.cn 'orderer.orderer3.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.ripe.io' --csr.keyrequest.reusekey 
+
+
+##Reenrolling orderer TLS certificates
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/tls-orderer-orderer3/msp
+ ./fabric-ca-client reenroll -d -u https://orderer3.ripe.io:orgroot@localhost:17701 --id.type orderer --csr.cn 'orderer3.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.ripe.io' --csr.keyrequest.reusekey 
+
+
+##Reenrolling orderer certificates
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/admin-orderer1/msp
+ ./fabric-ca-client reenroll -d -u https://admin.orderer1.ripe.io:adminroot@localhost:17720 --id.type admin --csr.cn 'orderer.orderer1.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.ripe.io' --csr.keyrequest.reusekey 

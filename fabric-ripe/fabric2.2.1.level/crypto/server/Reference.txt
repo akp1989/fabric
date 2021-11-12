@@ -1,0 +1,64 @@
+TLSCA:
+
+Use the follwing commands to enroll the bootstrap admin identity with the TLS CA server
+
+export FABRIC_CA_CLIENT_HOME=$PWD
+export FABRIC_CA_CLIENT_MSPDIR=$PWD/tls-ca/tlsadmin/msp
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$PWD/tls-root-cert/tls-ca-cert.pem (The ca-cert.pem has to be copied from the TLS CA server path post server startup)
+
+##Enrolling the TLS-CA bootstrap admin
+./fabric-ca-client enroll -d -u https://admin:adminroot@localhost:17701 --enrollment.profile tls --csr.cn 'tlsadmin@tls.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,0.0.0.0,192.168.0.66,*.ripe.io'
+
+
+##Register the OrgrootCA and Org Intermediate CA
+./fabric-ca-client register -d --id.name rcaadmin.tls --id.secret rcaadminpw --id.type peer -u https://localhost:17701 
+./fabric-ca-client register -d --id.name icaadmin.tls --id.secret icaadminpw --id.type peer -u https://localhost:17701 
+
+
+export FABRIC_CA_CLIENT_MSPDIR=$PWD/tls-ca/rcadmin/msp
+./fabric-ca-client enroll -d -u https://rcaadmin.tls:rcaadminpw@localhost:17701 --id.type peer --enrollment.profile tls --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,0.0.0.0,192.168.0.66,*.ripe.io'
+
+export FABRIC_CA_CLIENT_MSPDIR=$PWD/tls-ca/icaadmin/msp
+./fabric-ca-client enroll -d -u https://icaadmin.tls:icaadminpw@localhost:17701 --id.type peer --enrollment.profile tls --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,0.0.0.0,192.168.0.66,*.ripe.io' 
+
+Root CA:
+
+export FABRIC_CA_CLIENT_HOME=$PWD
+export FABRIC_CA_CLIENT_MSPDIR=$PWD/orgroot-ca/orgrootadmin/msp
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$PWD/tls-root-cert/tls-ca-cert.pem (The ca-cert.pem has to be copied from the TLS CA server path post server startup)
+
+
+#Enrolling the Orgroot CA bootstrap admin
+./fabric-ca-client enroll -d -u https://rcadmin:rcadminpw@localhost:17710 --csr.cn 'orgrootadmin@orgroot.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,0.0.0.0,192.168.0.66,*.ripe.io'
+
+
+#Register the intermediate CA bootstrap identity
+./fabric-ca-client register -d --id.name icadmin.root --id.secret icadminrootpw --id.type admin -u https://localhost:17710 --id.attrs '"hf.Registrar.Roles=user,admin","hf.Revoker=true","hf.IntermediateCA=true"'
+
+
+Org CA:
+
+export FABRIC_CA_CLIENT_HOME=$PWD
+export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/orgcaadmin/msp
+export FABRIC_CA_CLIENT_TLS_CERTFILES=$PWD/tls-root-cert/tls-ca-cert.pem (The ca-cert.pem has to be copied from the TLS CA server path post server startup)
+
+
+#Enrolling the Orgroot CA bootstrap admin
+./fabric-ca-client enroll -d -u https://icadmin.boot:icadminpw@localhost:17720 --csr.cn 'icadmin@orgca.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,0.0.0.0,192.168.0.66,*.ripe.io'
+
+
+./generatecrypto.sh orderer -a localhost -p 17720 -o orderer1 -t 17701 -d ripe.io -s 127.0.0.1,192.168.0.66,*.ripe.io
+./generatecrypto.sh orderer -a localhost -p 17720 -o orderer2 -t 17701 -d ripe.io -s 127.0.0.1,192.168.0.66,*.ripe.io
+./generatecrypto.sh orderer -a localhost -p 17720 -o orderer3 -t 17701 -d ripe.io -s 127.0.0.1,192.168.0.66,*.ripe.io
+
+./generatecrypto.sh peer -a localhost -p 17720 -o root -t 17701 -d ripe.io -s 127.0.0.1,192.168.0.66,*.root.ripe.io
+./generatecrypto.sh peer -a localhost -p 17720 -o test -t 17701 -d ripe.io -s 127.0.0.1,192.168.0.66,*.test.ripe.io
+
+
+
+ ./fabric-ca-client register -d --id.name test.root.ripe.io --id.secret peerroot --id.type peer -u https://localhost:17720 --csr.cn 'peer0.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io'
+ 
+ export FABRIC_CA_CLIENT_MSPDIR=$PWD/org-ca/test-root/msp
+ ./fabric-ca-client enroll -d -u https://test.root.ripe.io:peerroot@localhost:17720 --id.type peer --csr.cn 'peer0.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io'
+ ./fabric-ca-client reenroll -d -u https://test.root.ripe.io:peerroot@localhost:17720 --id.type peer --csr.cn 'peer0.root.ripe.io' --csr.names 'C=US,ST=California,L=SanFrancisco,O=ripe,OU=product' --csr.hosts 'localhost,127.0.0.1,192.168.0.66,*.root.ripe.io' --csr.keyrequest.reusekey 
+

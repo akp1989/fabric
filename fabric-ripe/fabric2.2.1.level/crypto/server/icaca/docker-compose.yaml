@@ -1,0 +1,11 @@
+orgca.ripe.io:
+  image: hyperledger/fabric-ca:1.4.9
+  container_name: orgca.ripe.io
+  ports:
+    - "17720:17720"
+  environment:
+    - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+  volumes:
+    - "$PWD:/etc/hyperledger/fabric-ca-server"
+    - orgca.ca_data:/etc/hyperledger
+  command: sh -c 'fabric-ca-server start -b icadmin.boot:icadminpw'

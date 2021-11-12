@@ -1,0 +1,189 @@
+version: '2'
+volumes:
+  peer0.root.ripe.io_data:
+  orderer1.ripe.io_msp:
+  orderer3.ripe.io_msp:
+  peer0.root.ripe.io_msp:
+  orderer3.ripe.io_data:
+  peer0.test.ripe.io_data:
+  orderer2.ripe.io_msp:
+  peer0.test.ripe.io_msp:
+  orderer2.ripe.io_data:
+  orderer1.ripe.io_data:
+networks:
+  ripe:
+services:
+  peer0.root.ripe.io:
+    container_name: peer0.root.ripe.io
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_PEER_GOSSIP_STATE_ENABLED=false
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7151
+     - CORE_PEER_ID=peer0.root.ripe.io
+     - CORE_PEER_PROFILE_ENABLED=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.root.ripe.io:7051
+     - CORE_PEER_ADDRESS=peer0.root.ripe.io:7051
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=RootMSP
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_ripe
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.root.ripe.io:7051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - CORE_PEER_CHAINCODEADDRESS=peer0.root.ripe.io:7151
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/root/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/root/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.root.ripe.io_msp:/etc/hyperledger/fabric
+     - peer0.root.ripe.io_data:/var/hyperledger/production
+    ports:
+     - 7051:7051
+    networks:
+     - ripe
+  orderer2.ripe.io:
+    container_name: orderer2.ripe.io
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_KAFKA_VERBOSE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer2.ripe.io
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_GENERAL_LISTENPORT=9050
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer2/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer2/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer2.ripe.io_msp:/var/hyperledger/orderer
+     - orderer2.ripe.io_data:/var/hyperledger/production
+    ports:
+     - 9050:9050
+    networks:
+     - ripe
+  orderer3.ripe.io:
+    container_name: orderer3.ripe.io
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_KAFKA_VERBOSE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer3.ripe.io
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_GENERAL_LISTENPORT=11050
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer3/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer3/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer3.ripe.io_msp:/var/hyperledger/orderer
+     - orderer3.ripe.io_data:/var/hyperledger/production
+    ports:
+     - 11050:11050
+    networks:
+     - ripe
+  peer0.test.ripe.io:
+    container_name: peer0.test.ripe.io
+    image: hyperledger/fabric-peer
+    environment:
+     - CORE_PEER_GOSSIP_STATE_ENABLED=false
+     - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9151
+     - CORE_PEER_ID=peer0.test.ripe.io
+     - CORE_PEER_PROFILE_ENABLED=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+     - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+     - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.test.ripe.io:9051
+     - CORE_PEER_ADDRESS=peer0.test.ripe.io:9051
+     - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/keystore/key.pem
+     - CORE_PEER_LOCALMSPID=TestMSP
+     - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=fabric_ripe
+     - CORE_PEER_GOSSIP_USELEADERELECTION=true
+     - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.test.ripe.io:9051
+     - CORE_PEER_GOSSIP_SKIPHANDSHAKE=true
+     - CORE_PEER_CHAINCODEADDRESS=peer0.test.ripe.io:9151
+     - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+     - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/signcerts/cert.pem
+     - CORE_PEER_TLS_ENABLED=true
+     - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/tlscacerts/tlsca-cert.pem
+     - CORE_PEER_GOSSIP_ORGLEADER=false
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric/peer
+    volumes:
+     - /var/run:/host/var/run
+     - ./../crypto/test/msp-peer0:/etc/hyperledger/fabric/msp
+     - ./../crypto/test/msp-tls-peer0:/etc/hyperledger/fabric/tls
+     - peer0.test.ripe.io_msp:/etc/hyperledger/fabric
+     - peer0.test.ripe.io_data:/var/hyperledger/production
+    ports:
+     - 9051:9051
+    networks:
+     - ripe
+  orderer1.ripe.io:
+    container_name: orderer1.ripe.io
+    image: hyperledger/fabric-orderer
+    environment:
+     - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+     - ORDERER_KAFKA_VERBOSE=true
+     - FABRIC_LOGGING_SPEC=INFO
+     - ORDERER_DEBUG_BROADCASTTRACEDIR=data/logs
+     - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_GENERAL_CLUSTER_CLIENTPRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+     - ORDERER_KAFKA_TOPIC_REPLICATIONFACTOR=1
+     - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/tlscacerts/tlsca-cert.pem]
+     - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+     - ORDERER_GENERAL_GENESISMETHOD=file
+     - ORDERER_GENERAL_LOGLEVEL=DEBUG
+     - ORDERER_HOST=orderer1.ripe.io
+     - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+     - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+     - ORDERER_GENERAL_CLUSTER_CLIENTCERTIFICATE=/var/hyperledger/orderer/tls/signcerts/cert.pem
+     - ORDERER_HOME=/tmp/hyperledger/orderer
+     - ORDERER_GENERAL_TLS_ENABLED=true
+     - ORDERER_GENERAL_LISTENPORT=7050
+     - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/keystore/key.pem
+    volumes:
+     - ./../channelartifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+     - ./../crypto/orderer1/msp:/var/hyperledger/orderer/msp
+     - ./../crypto/orderer1/msp-tls-orderer:/var/hyperledger/orderer/tls
+     - orderer1.ripe.io_msp:/var/hyperledger/orderer
+     - orderer1.ripe.io_data:/var/hyperledger/production
+    ports:
+     - 7050:7050
+    networks:
+     - ripe
