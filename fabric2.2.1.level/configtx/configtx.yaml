@@ -44,7 +44,7 @@ Organizations:
         ID: OrdererMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
-        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer/msp
+        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -68,7 +68,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org1MSP
 
-        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/org1/msp
+        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/org1/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -103,7 +103,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org2MSP
 
-        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/org2/msp
+        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/org2/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -137,7 +137,7 @@ Organizations:
         # ID to load the MSP definition as
         ID: Org3MSP
 
-        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/org3/msp
+        MSPDir: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/org3/msp
 
         # Policies defines the set of policies at this level of the config tree
         # For organization policies, their canonical path is usually
@@ -367,16 +367,16 @@ Orderer: &OrdererDefaults
         Consenters:
             - Host: orderer1.ceadar.org
               Port: 7050
-              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer1/msp-tls-orderer/signcerts/cert.pem
-              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer1/msp-tls-orderer/signcerts/cert.pem
+              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer1/msp-tls-orderer/signcerts/cert.pem
+              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer1/msp-tls-orderer/signcerts/cert.pem
             - Host: orderer2.ceadar.org
               Port: 9050
-              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer2/msp-tls-orderer/signcerts/cert.pem
-              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer2/msp-tls-orderer/signcerts/cert.pem
+              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer2/msp-tls-orderer/signcerts/cert.pem
+              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer2/msp-tls-orderer/signcerts/cert.pem
             - Host: orderer3.ceadar.org
               Port: 11050
-              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer3/msp-tls-orderer/signcerts/cert.pem
-              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1/crypto/orderer3/msp-tls-orderer/signcerts/cert.pem
+              ClientTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer3/msp-tls-orderer/signcerts/cert.pem
+              ServerTLSCert: /home/prabhakaran/workspace/fabric/fabric2.2.1.level/crypto/orderer3/msp-tls-orderer/signcerts/cert.pem
 
     # Batch Timeout: The amount of time to wait before creating a batch
     BatchTimeout: 2s
