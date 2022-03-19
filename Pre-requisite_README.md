@@ -116,3 +116,10 @@ export GOPATH=$HOME/gopath
 
 source ~/.profile
 ```
+
+# Issues to be noted while installing directly on macos
+
+## dos2unix for shell scripts
+Run the dos2unix tool to convert the shell script from dos file format to unix file format. 
+## Docker desktop setup 
+Use gRPC FUSE for file sharing - Disable this options while using docker desktop for macos. Enabling this causes the /host/var/run/docker.soc path unavailable during chaincode installation process
